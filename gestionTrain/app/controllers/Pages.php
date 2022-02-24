@@ -19,4 +19,9 @@
         {
             $this->view('pages/dashboard');
         }
+
+        public function booking()
+        {
+            $this->view('pages/booking');
+        }
     }

@@ -15,12 +15,6 @@
             $trains = $this->train->find_allTrain();
             $voyages = $this->voyage->getAllVoyages();
 
-            $arr_train = [];
-
-            for ($i=0; $i < count($trains); $i++) { 
-                
-            }
-            // $allTrainName = $this->voyage->getNameTrain();
             $data = [
                 "page-name" => 'Voyages',
                 'trains' => $trains,
@@ -78,6 +72,7 @@
             }
         }
 
+
         public function index()
         {
             $countTrain = $this->train->countTrain();
@@ -95,6 +90,76 @@
                 $this->view('voyages/index',$data);
             } else {
                 header("location:". URLROOT ."/admins/login");
+            }
+        }
+
+        public function cancel($id)
+        {
+            $voyage = $this->voyage->find_voyage($id);
+            $data = [
+                'page-name' => 'Cancel voyage',
+                'voyage' => $voyage,
+                "dateArchive" =>"",
+                "Error" => "",
+                "Success" => ""
+            ];
+
+            if($_SERVER["REQUEST_METHOD"] == "POST"){
+                $POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+
+                $data = [
+                    "page-name" => "Cancel voyage",
+                    "voyage" => $voyage,
+                    "dateArchive" =>trim($_POST["dateArchive"]),
+                    "Error" => "",
+                    "Success" => ""
+                ];
+
+                if(empty($data["dateArchive"])){
+                    $data["Error"] = "Date field is empty, try again!" ;
+                } elseif($this->voyage->is_dateExists($data["dateArchive"])){
+                    $data["Error"] = "This date is already exists!" ;
+                } else {
+                    if($this->voyage->canceled_voyage($id,$data["dateArchive"])){
+                        $data["Success"] = "Voyage has been archived successfully.";
+                        header("Location: " . URLROOT . "/voyages/voyage");
+                    } else {
+                        die("something is wrong.");
+                    }
+                }
+
+            }
+            if(is_loggedIn()){
+                $this->view('voyages/cancel',$data);
+            } else {
+                header("location:". URLROOT ."/admins/login");
+            }
+        }
+
+        public function archive()
+        {
+            $voyages = $this->voyage->getAllVoyages();
+            $archives = $this->voyage->getArchiveVoyage();
+
+            $data = [
+                "page-name" => "Archive des voyages",
+                "voyages" =>$voyages,
+                "archives" =>$archives
+            ];
+
+            if(is_loggedIn()){
+                $this->view('voyages/archive',$data);
+            } else {
+                header("location:". URLROOT ."/admins/login");
+            }
+        }
+        
+        public function deleteArchive($id)
+        {
+            if($this->voyage->deleteArchive($id)) {
+                header("location:". URLROOT ."/voyages/archive");
+            }else {
+                die("something is wrong!");
             }
         }
     }

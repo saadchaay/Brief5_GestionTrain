@@ -88,13 +88,11 @@
             }
         }
 
-        public function find_noActiveVoyages()
+        public function getArchiveVoyage()
         {
-            $this->db->query("SELECT * FROM `voyages`, `voyages_annule` WHERE `voyages`.id_voyage IN (
-                SELECT id_voyage_fk FROM voyages_annule)");
+            $this->db->query("SELECT * FROM `voyages_annule`");
             $result = $this->db->resultSet();
-            
-            
+            return $result ;
         }
 
         public function countVoyage(Type $var = null)
@@ -111,5 +109,27 @@
             $this->db->bind("ID", $id_train_fk);
             $this->db->execute();
             return $this->db->single();
+        }
+
+        public function is_dateExists($date)
+        {
+            $this->db->query("SELECT * FROM voyages_annule");
+            $this->db->execute();
+            $archives = $this->db->resultSet();
+            for ($i=0; $i < count($archives); $i++) { 
+                $result = ($archives[$i]->date_VA == $date)?true:false ;
+            }
+            return $result ;
+        }
+        
+        public function deleteArchive($id)
+        {
+            $this->db->query("DELETE FROM `voyages_annule` WHERE id_VA = :id");
+            $this->db->bind(":id", $id);
+            if($this->db->execute()){
+                return true;
+            } else {
+                return false ;
+            }
         }
     }

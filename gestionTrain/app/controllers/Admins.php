@@ -78,7 +78,15 @@
 
         public function index()
         {
-            
+            $data = [
+                "usernameError" => "",
+                "passwordError" => ""
+            ];
+            if(!is_loggedIn()){
+                $this->view('admins/login',$data);
+            } else {
+                header("location:". URLROOT ."/voyages/");
+            }
         }
 
     }

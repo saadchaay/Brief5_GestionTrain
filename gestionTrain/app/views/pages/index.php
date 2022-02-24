@@ -1,26 +1,21 @@
 <?php 
-    require APPROOT.'/views/includes/head.php' ;
+    require APPROOT. "/views/pages/head.php" ;
 ?>
 
-<header class="container-fluid bg-light">
-    <?php require APPROOT .'/views/includes/navbar.php' ?>
-</header>
-<section class="bg-light text-left banner-home">
-    <div class="container-xl">
-        <div class="d-flex justify-content-around align-items-center">
-            <div class="hyper-text">
-                <h1>EXPLORE</h1>
-                <h2>YOUR TRIP WITH TRAIN</h2>
-                <h6>Let's Begin your Journey</h6>
-                <button>
-                    Book A Trip
-                </button>
-            </div>
-            <img src="<?php echo URLROOT; ?>/public/images/banne-img.png" alt="">
+<?php 
+    require APPROOT. "/views/pages/navbar.php" ;
+?>
+
+<section class="home-sec">
+    <div class="container">
+        <div class="d-flex justify-content-center content flex-column">
+            <h2 class="text-left my-3">WELCOME TO BOOK YOUR TRAIN</h2>
+            <h5 class="text-left mt-1 mb-4">We saves your time both while purchasing <br> the check-in and during the travel.</h5>
+            <button onclick="window.location.href='<?php echo URLROOT; ?>/pages/booking';" class="btn my-3">Book Now</button>
         </div>
     </div>
 </section>
 
 <?php 
-    require APPROOT.'/views/includes/footer.php' ;
+    require APPROOT.'/views/pages/footer.php' ;
 ?>
