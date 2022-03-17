@@ -58,4 +58,47 @@
                 return false ;
             }
         }
+
+        public function jointure_user_client($id)
+        {
+            $this->db->query("SELECT * FROM users INNER JOIN clients WHERE `users`.id_user = `clients`.id_user_fk AND `users`.id_user = :id");
+            $this->db->bind(":id", $id);
+            if($this->db->execute()) {
+                return $this->db->single();
+            } else {
+                return false;
+            }
+        }
+        
+        public function Check_join_users_clients_exists($id, $email, $username)
+        {
+            $this->db->query("SELECT * FROM users INNER JOIN clients WHERE `users`.id_user = `clients`.id_user_fk AND `users`.id_user NOT IN (SELECT id_user FROM users WHERE id_user = :id)");
+            $this->db->bind(":id", $id);
+            $results = $this->db->execute();
+            $tmp = 0;
+            if($this->db->rowCount() > 1){
+                if($results["email"] == $email || $results["username"] == $username){
+                    $tmp = 1;
+                }
+            }
+            
+            if($tmp == 0){
+                return false ;
+            } else {
+                return true;
+            }
+        }
+
+        public function updateClient($data, $id)
+        {
+            $this->db->query("UPDATE `clients` SET `username`= :username, `password`= :password WHERE `id_user_fk` = :id" );
+            $this->db->bind(":username" , $data["username"]);
+            $this->db->bind(":password" , $data["newPassword"]);
+            $this->db->bind(":id" , $id);
+            if($this->db->execute()){
+                return true;
+            } else {
+                return false ;
+            }
+        }
     }

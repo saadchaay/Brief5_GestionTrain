@@ -12,12 +12,14 @@
         {
             $this->db->query("SELECT * FROM admins WHERE username = :username");
             $this->db->bind(':username', $username);
-            $admin = $this->db->single();
-            $hashedPassword = $admin->password ;
-            if(password_verify($password, $hashedPassword)){
-                return $admin;
-            }else {
-                return false ;
+            if($this->db->single()){
+                $admin = $this->db->single();
+                $hashedPassword = $admin->password;
+                if(password_verify($password, $hashedPassword)){
+                    return $admin;
+                }else {
+                    return false ;
+                }
             }
         }
 

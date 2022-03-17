@@ -18,18 +18,6 @@
             } else {
                 return false ;
             }
-
-            /* $this->db->query("SELECT * FROM users");
-            $results = $this->db->resultSet();
-            foreach ($results as $row) {
-                if($row["email"] === $email){
-                    $check = true;
-                    break;
-                } else {
-                    $check = false ;
-                }
-            }
-            return $check; */
         }
 
         public function getLastUser()
@@ -54,4 +42,25 @@
             }
         }
 
+        public function getUserById($ID)
+        {
+            $this->db->query("SELECT * FROM users WHERE id_user = :id_user");
+            $this->db->bind(":id_user", $ID);
+            $this->db->execute();
+            return $this->db->single();
+        }
+
+        public function updateUser($data, $id)
+        {
+            $this->db->query("UPDATE `users` SET `full_name`= :fullName, `email`= :email, `telephone` = :phone WHERE `id_user` = :id");
+            $this->db->bind(":fullName" , $data["fullName"]);
+            $this->db->bind(":email" , $data["email"]);
+            $this->db->bind(":phone" , $data["phone"]);
+            $this->db->bind(":id" , $id);
+            if($this->db->execute()){
+                return true;
+            } else {
+                return false ;
+            }
+        }
     }

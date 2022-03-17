@@ -9,10 +9,13 @@
                 <ul class="navbar-nav ml-5">
                     <li class="nav-item active mx-5"><a class="nav-link" href="<?php echo URLROOT ;?>/">Home</a></li>
                     <li class="nav-item mx-2"><a class="nav-link" href="<?php echo URLROOT ;?>/pages/booking">Booking</a></li>
+                    <?php if(isset($_SESSION['id_client'])): ?>
+                        <li class="nav-item ml-5"><a class="nav-link" href="<?php echo URLROOT ;?>/pages/all_reservations">All Reservations</a></li>
+                    <?php endif ?>
                 </ul>
                 <ul class="navbar-nav ml-auto">
                     <?php if(isset($_SESSION['id_client'])): ?>
-                        <li class="nav-item active"><a class="btn rounded-pill btn-dark py-2 px-3" href=""><i class="fas fa-user-cog" style="color: white;"></i></a></li>
+                        <li class="nav-item active"><a class="btn rounded-pill btn-dark py-2 px-3" href="<?php echo URLROOT ;?>/users/profil"><i class="fas fa-user-cog" style="color: white;"></i></a></li>
                         <li class="nav-item"><a class="btn rounded-pill btn-dark py-2 px-3" href="<?php echo URLROOT ;?>/users/logout"><i class="fas fa-sign-in-alt" style="color: white;"></i></a></li>
                     <?php else: ?>
                         <li class="nav-item active"><a class="btn rounded-pill btn-dark py-2 px-4" href="<?php echo URLROOT ;?>/users/login">Login</a></li>

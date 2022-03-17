@@ -65,14 +65,14 @@
         public function createAdminSession($admin)
         {
             $_SESSION['admin_id'] = $admin->id_admin;
-            $_SESSION['username'] = $admin->username;
+            $_SESSION['username_admin'] = $admin->username;
             header('location:'.URLROOT.'/voyages/');
         }
 
         public function Logout()
         {
             unset($_SESSION['admin_id']);
-            unset($_SESSION['username']);
+            unset($_SESSION['username_admin']);
             header('location:'.URLROOT.'/admins/login');
         }
 

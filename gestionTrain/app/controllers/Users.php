@@ -51,7 +51,7 @@
 
                 $usernameValidation = "/^[a-zA-Z0-9]*$/";
                 $fullNameValidation = "/^([a-zA-Z' ]+)$/";
-                // $phoneValidation = "/^[0]{1}[5-8]{1}[0-9]{8}*$/";
+                
                 $passwordValidation = "/^(.{0,7}|[^a-z]*|[^\d]*)$/i";
 
                 // check the inputs
@@ -164,6 +164,7 @@
         {
             $_SESSION['id_client'] = $user->id_client;
             $_SESSION['username'] = $user->username;
+            $_SESSION['id_fk_user'] = $user->id_user_fk;
             header('location:'.URLROOT.'/pages/');
         }
 
@@ -172,5 +173,83 @@
             unset($_SESSION['id_client']);
             unset($_SESSION['username']);
             header('location:'.URLROOT.'/pages/');
+        }
+
+        public function profil()
+        {
+            $data = [
+                "fullName" => "",
+                "username" => "",
+                "email" => "",
+                "phone" => "",
+                "oldPassword" => "",
+                "newPassword" => "",
+                "confirmNewPassword" => "",
+                "Errors" => "",
+                "Success" => ""
+            ];
+            if(is_logged_user()){
+                $user = $this->client->jointure_user_client($_SESSION["id_fk_user"]);
+                $hashedPassword = $user->password ;
+                $data = [
+                    "fullName" => $user->full_name,
+                    "username" => $user->username,
+                    "email" => $user->email,
+                    "phone" => $user->telephone,
+                    "oldPassword" => "",
+                    "newPassword" => "",
+                    "confirmNewPassword" => "",
+                    "Errors" => "",
+                    "Success" => ""
+                ];
+                if($_SERVER["REQUEST_METHOD"] == "POST")
+                {
+                    $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+                    
+                    $data = [
+                        "fullName" => trim($_POST["fullName"]),
+                        "username" => trim($_POST["username"]),
+                        "email" => trim($_POST["email"]),
+                        "phone" => trim($_POST["phone"]),
+                        "oldPassword" => trim($_POST["oldPassword"]),
+                        "newPassword" => (isset($_POST["newPassword"]))?trim($_POST["newPassword"]):"",
+                        "confirmNewPassword" => (isset($_POST["confirmNewPassword"]))?trim($_POST["confirmNewPassword"]):"",
+                        "Errors" => "",
+                        "Success" => ""
+                    ];
+
+                    $usernameValidation = "/^[a-zA-Z0-9]*$/";
+                    $fullNameValidation = "/^([a-zA-Z' ]+)$/";
+                    $passwordValidation = "/^(.{0,7}|[^a-z]*|[^\d]*)$/i";
+
+                    if(empty($data['username']) || empty($data["fullName"]) || empty($data["phone"]) || empty($data["oldPassword"]) || empty($data["email"])) 
+                    {
+                        $data["Errors"] = "Some field is empty, Try again!";
+                    } elseif(!preg_match($usernameValidation, $data['username']) || !preg_match($fullNameValidation, $data["fullName"]) || !filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+                        $data["Errors"] = "Please enter the correct format!";
+                    } elseif(strlen($data["newPassword"]) < 8 || preg_match($passwordValidation, $data["newPassword"])) {
+                        $data["Errors"] = "The password must be at least 8 characters(letters and numbers).";
+                    } elseif(!(password_verify($data["oldPassword"], $hashedPassword))){
+                        $data["Errors"] = "The old Password is incorrect.";
+                    } elseif($data["newPassword"] !== $data["confirmNewPassword"]){
+                        $data["Errors"] = "The passwords are not match, please confirm the password!";
+                    } elseif ($this->client->Check_join_users_clients_exists($_SESSION["id_fk_user"], $data["email"], $data["username"])) {
+                        $data['Errors'] = 'The Email or Username is already taken.';
+                    }
+
+                    if(empty($data["Errors"])) {
+                        // hash password
+                        $data['newPassword'] = password_hash($data['newPassword'], PASSWORD_DEFAULT);
+                        // registration logic
+                        if($this->user->updateUser($data, $_SESSION["id_fk_user"]) && $this->client->updateClient($data, $_SESSION["id_fk_user"])){
+                            $data["Success"] = "Update your profil has been successfully.";
+                            $this->view("/users/profil", $data);
+                        } else {
+                            die("Something is wrong, check the user model");
+                        }
+                    } 
+                }
+            }
+            $this->view("/users/profil", $data);
         }
     }

@@ -1,2 +1,16 @@
+// admin
+
 username: admin
 password: admin00123
+
+
+// clients
+
+username: saad09 
+password: qwer1234
+
+//TODO: 
+page my reservations
+canceling before 1 hour
+order trips by time
+tickets

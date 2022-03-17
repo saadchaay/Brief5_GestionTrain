@@ -103,21 +103,13 @@
             return $count;
         }
 
-        public function getNameTrain($id_train_fk)
-        {
-            $this->db->query("SELECT * FROM trains,voyages WHERE `voyages`.id_train_fk = `trains`.`id_train` AND `voyages`.`id_train_fk` = :ID");
-            $this->db->bind("ID", $id_train_fk);
-            $this->db->execute();
-            return $this->db->single();
-        }
-
-        public function is_dateExists($date)
+        public function is_dateExists($id,$date)
         {
             $this->db->query("SELECT * FROM voyages_annule");
             $this->db->execute();
             $archives = $this->db->resultSet();
             for ($i=0; $i < count($archives); $i++) { 
-                $result = ($archives[$i]->date_VA == $date)?true:false ;
+                $result = (($archives[$i]->date_VA == $date) && ($archives[$i]->id_voyage_fk == $id))?true:false ;
             }
             return $result ;
         }
@@ -132,4 +124,35 @@
                 return false ;
             }
         }
+
+        public function find_voyage_by_station($depart, $arrive)
+        {
+            $this->db->query("SELECT * FROM voyages WHERE garre_depart = :depart AND garre_destination = :arrive");
+
+            $this->db->bind(':depart', $depart);
+            $this->db->bind(':arrive', $arrive);
+            
+            return $this->db->resultSet();
+        }
+
+
+        public function find_join_voyage()
+        {
+            $this->db->query("SELECT * FROM voyages INNER JOIN voyages_annule WHERE `voyages`.id_voyage = `voyages_annule`.id_voyage_fk");
+            return $this->db->resultSet();
+        }
+
+        // jointure betweeb train, voyage and booking
+        public function join_VBT($id_voyage)
+        {
+            $this->db->query("SELECT * FROM trains INNER JOIN voyages INNER JOIN reservations WHERE `voyages`.`id_train_fk` = `trains`.id_train AND `voyages`.id_voyage = :id");
+            $this->db->bind(":id", $id_voyage);
+            if($this->db->execute()){
+                return $this->db->resultSet();
+            } else {
+                return false;
+            }
+        }
+
+
     }

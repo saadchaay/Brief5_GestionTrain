@@ -72,7 +72,6 @@
             }
         }
 
-
         public function index()
         {
             $countTrain = $this->train->countTrain();
@@ -117,7 +116,7 @@
 
                 if(empty($data["dateArchive"])){
                     $data["Error"] = "Date field is empty, try again!" ;
-                } elseif($this->voyage->is_dateExists($data["dateArchive"])){
+                } elseif($this->voyage->is_dateExists($id,$data["dateArchive"])){
                     $data["Error"] = "This date is already exists!" ;
                 } else {
                     if($this->voyage->canceled_voyage($id,$data["dateArchive"])){
