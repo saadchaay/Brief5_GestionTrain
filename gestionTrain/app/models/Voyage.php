@@ -127,7 +127,7 @@
 
         public function find_voyage_by_station($depart, $arrive)
         {
-            $this->db->query("SELECT * FROM voyages WHERE garre_depart = :depart AND garre_destination = :arrive");
+            $this->db->query("SELECT * FROM voyages WHERE garre_depart = :depart AND garre_destination = :arrive ORDER BY `voyages`.`heure_depart`");
 
             $this->db->bind(':depart', $depart);
             $this->db->bind(':arrive', $arrive);

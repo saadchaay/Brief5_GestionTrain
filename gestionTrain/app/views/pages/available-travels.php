@@ -19,11 +19,6 @@
                 <?php echo $data['Errors']; ?>
             </div>
         <?php endif ;?>
-        <?php if(!empty($data["Success"])): ?>
-            <div class="alert alert-success my-2" role="alert" id="alert-failed">
-                <?php echo $data['Success']; ?>
-            </div>
-        <?php endif ;?>
         <form class="p-2" action="" method="post"> 
             <?php 
                 for ($i=0; $i < $data["places"]; $i++): 
@@ -105,7 +100,6 @@
     </div>
     <?php endif ;?>
 </body>
-
 <?php 
     require APPROOT.'/views/pages/footer.php' ;
 ?>

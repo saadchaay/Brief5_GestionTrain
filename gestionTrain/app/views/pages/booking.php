@@ -11,6 +11,7 @@
 
 <body style="background-color: #20c997;">
     <div class="container rounded shadow-sm mt-5 p-4" style="background-color: white;">
+    
     <?php if(!empty($data["Errors"])): ?>
         <div class="alert alert-danger my-2" role="alert" id="alert-failed">
             <?php echo $data['Errors']; ?>
@@ -27,7 +28,7 @@
             </div>
             <div class="row">
                 <div class="col-md-6 col-12 mb-4">
-                    <div class="form-control d-flex flex-column" style="height: 70px;">
+                    <div class="form-control d-flex flex-column" style="height: 100px;">
                         <p class="h-blue">TRAVEL FROM</p> 
                         <select name="departStation" id="" class="border-0 outline-none">
                             <option value="" hidden selected>Select city</option>
@@ -38,7 +39,7 @@
                     </div>
                 </div>
                 <div class="col-md-6 col-12 mb-4">
-                    <div class="form-control d-flex flex-column" style="height: 70px;">
+                    <div class="form-control d-flex flex-column" style="height: 100px;">
                         <p class="h-blue">TRAVEL TO</p> 
                         <select name="arriveStation" id="" class="border-0 outline-none">
                             <option value="" hidden selected>Select city</option>
@@ -51,17 +52,17 @@
             </div>
             <div class="row">
                 <div class="col-md-3 col-12 mb-4">
-                    <div class="form-control d-flex flex-column" style="height: 70px;">
-                        <p class="h-blue">DEPARTING</p> <input name="departTime" class="inputbox textmuted" type="date">
+                    <div class="form-control d-flex flex-column" style="height: 100px;">
+                        <p class="h-blue">DEPARTING</p> <input name="departTime" class="inputbox textmuted" type="date" min="<?=date('Y-m-d')?>">
                     </div>
                 </div>
                 <div class="col-md-3 col-12 mb-4">
-                    <div class="form-control d-flex flex-column" style="height: 70px;">
-                        <p class="h-blue">RETURNING</p> <input name="arriveTime" class="inputbox textmuted " type="date">
+                    <div class="form-control d-flex flex-column" style="height: 100px;">
+                        <p class="h-blue">RETURNING</p> <input name="arriveTime" class="inputbox textmuted " type="date" min="<?=date("Y-m-d")?>">
                     </div>
                 </div>
                 <div class="col-md-3 mb-4">
-                    <div class="form-control d-flex flex-column" style="height: 70px;">
+                    <div class="form-control d-flex flex-column" style="height: 100px;">
                         <p class="h-blue">ADULTS(18+)</p> 
                         <select name="places" class="border-0 outline-none">
                             <?php for ($i=1; $i < 11; $i++): ?>

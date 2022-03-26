@@ -8,6 +8,7 @@
             $this->voyage = $this->model('Voyage');
             $this->user = $this->model('User');
             $this->train = $this->model('Train');
+            $this->ticket = $this->model('Ticket');
         }
 
         public function index()
@@ -78,10 +79,10 @@
                     if($this->voyage->find_voyage_by_station($data["departStation"],$data["arriveStation"])){
                         $results = $this->voyage->find_voyage_by_station($data["departStation"],$data["arriveStation"]);
                         if(!empty($ids_voyage)){
-                            for ($i=0; $i < count((array)$results); $i++) { 
+                            for ($j=0; $j < count((array)$results); $j++) { 
                                 for ($i=0; $i < count((array)$ids_voyage); $i++) { 
-                                    if($results[$i]->id_voyage === $ids_voyage[$i]){
-                                        unset($results[$i]);
+                                    if($results[$j]->id_voyage === $ids_voyage[$i]){
+                                        unset($results[$j]);
                                     }
                                 }
                             }
@@ -113,7 +114,8 @@
                 "places" => $places,
                 "client" => "",
                 "Errors" => "",
-                "Success" => ""
+                "Success" => "",
+                "Ticket" => []
             ];
             
             $place_this_voyage = $this->voyage->join_VBT($data["id_voyage"]);
@@ -189,12 +191,37 @@
                                 }
                             }
                         }
-                        if($success == 1) {
-                            $data["Success"] = "Your Booking has been successfully";
+                        if(is_logged_user()){
+                            if($success == 1) {
+                                $booking = ($this->booking->get_last_insert_res($_SESSION["id_fk_user"]));
+                                $ticket_info = [
+                                    "ticketNum" => mt_rand(),
+                                    "id_booking" => $booking->id_reserv,
+                                    "id_user" => $_SESSION["id_fk_user"],
+                                    "Success" => ""
+                                ];
+                                if($this->ticket->insert_ticket($ticket_info)){
+                                    $_SESSION["Ticket"] = $ticket_info;
+                                    header("location: ".URLROOT."/pages/ticket");
+                                }
+                            } else {
+                                $data["Errors"] = "Your Booking failed";
+                            }
                         } else {
-                            $data["Errors"] = "Your Booking failed";
+                            $booking = ($this->booking->get_last_insert_resv());
+                            $ticket_info = [
+                                "ticketNum" => mt_rand(),
+                                "id_booking" => $booking->id_reserv,
+                                "id_user" => $booking->id_user_fk,
+                                "Success" => ""
+                            ];
+                            if($this->ticket->insert_ticket($ticket_info)){
+                                $_SESSION["Ticket"] = $ticket_info;
+                                header("location: ".URLROOT."/pages/ticket");
+                            } else {
+                                $data["Errors"] = "Your Booking failed";
+                            }
                         }
-    
                         $this->view("pages/available-travels", $data);
                     } else {
                         $this->view("pages/available-travels", $data);
@@ -208,10 +235,11 @@
         public function all_reservations()
         {
             $data = [
-                "allRes" => $this->booking->get_reservation_by_id($_SESSION["id_fk_user"]),
+                "allRes" => $this->booking->get_reservations_by_id($_SESSION["id_fk_user"]),
                 "res" => [],
                 "Success" => ""
             ];
+
             $tmp_arr = [];
             
             for ($i=0; $i < count($data["allRes"]); $i++) { 
@@ -235,6 +263,8 @@
             ];
 
             $date_now = date("Y-m-d");
+
+            // convert time to minutes string
             $arr_time_now = explode(":", date("H:i"));
             $arr_time_now = ($arr_time_now[0]*60) + $arr_time_now[1];
             $arr_voyage_time = explode(":", $status["booking"]->heure_depart);
@@ -271,5 +301,50 @@
                 $data["Success"] = "Your trip has been canceled successfully.";
                 header("location:" .URLROOT. "/pages/all_reservations");
             }
+        }
+
+        public function ticket()
+        {
+            if(!empty($_SESSION["Ticket"])){
+                $last_ticket = $this->ticket->get_last_ticket();
+                $data = [
+                    "voyage" => $this->booking->get_reservation($last_ticket->id_reserv_fk),
+                    "ticket_details" => $_SESSION["Ticket"],
+                    "ticketNum" => "",
+                    "Success" => "Your Booking Has Been Successfully.",
+                    "Errors" => ""
+                ];
+                $this->view("/pages/ticket", $data);
+            } else {
+                $data = [
+                    "voyage" => "",
+                    "ticket_details" => "",
+                    "ticketNum" => "",
+                    "Success" => "",
+                    "Errors" => "" 
+                ];
+            }
+
+            if($_SERVER["REQUEST_METHOD"] == "POST"){
+                $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+                $data["Success"] = "";
+                $data["ticketNum"] = trim($_POST["ticketNum"]);
+
+                if(empty($data["ticketNum"])){
+                    $data["Errors"] = "Please Enter Your Ticket Number!";
+                } elseif(strlen($data["ticketNum"]) < 7 ){
+                    $data["Errors"] = "Please the ticket number must be at least 8 number!";
+                }
+
+                if(!empty($data["Errors"])){
+                    if($this->ticket->get_ticket($data["ticketNum"])){
+                        $data["ticket_details"] = $this->ticket->get_ticket($data["ticketNum"]);
+                    }
+                }
+            }
+            
+            $_SESSION["Ticket"] = [];
+            unset($_SESSION["Ticket"]);
+            $this->view("/pages/ticket", $data);
         }
     }

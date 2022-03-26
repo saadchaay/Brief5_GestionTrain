@@ -40,10 +40,10 @@
             return $this->db->rowCount();
         }
 
-        public function get_reservation_by_id($id)
+        public function get_reservations_by_id($id_user)
         {
-            $this->db->query("SELECT * FROM reservations INNER JOIN voyages INNER JOIN trains WHERE `reservations`.`id_voyage_fk` = `voyages`.id_voyage AND `trains`.`id_train` = `voyages`.`id_train_fk` AND `reservations`.`id_user_fk` = :id");
-            $this->db->bind(":id", $id);
+            $this->db->query("SELECT * FROM reservations INNER JOIN voyages INNER JOIN trains WHERE `reservations`.`id_voyage_fk` = `voyages`.id_voyage AND `trains`.`id_train` = `voyages`.`id_train_fk` AND `reservations`.`id_user_fk` = :id ORDER BY `reservations`.`id_reserv` DESC");
+            $this->db->bind(":id", $id_user);
             if($this->db->execute()) {
                 return $this->db->resultSet();
             } else {
@@ -68,6 +68,27 @@
             $this->db->bind(":id", $id);
             if($this->db->execute()){
                 return true;
+            } else {
+                return false;
+            }
+        }
+
+        public function get_last_insert_res($id_user)
+        {
+            $this->db->query("SELECT id_reserv FROM reservations WHERE id_user_fk = :id ORDER BY id_reserv DESC LIMIT 1");
+            $this->db->bind(":id", $id_user);
+            if($this->db->execute()){
+                return $this->db->single();
+            } else {
+                return false;
+            }
+        }
+
+        public function get_last_insert_resv()
+        {
+            $this->db->query("SELECT * FROM reservations ORDER BY id_reserv DESC LIMIT 1");
+            if($this->db->execute()){
+                return $this->db->single();
             } else {
                 return false;
             }
