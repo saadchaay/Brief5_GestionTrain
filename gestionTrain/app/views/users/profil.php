@@ -43,9 +43,6 @@
                             <div class="col-md-6"><input name="email" type="text" class="form-control" placeholder="Email" value="<?php echo $data["email"] ;?>"></div>
                             <div class="col-md-6"><input name="phone" type="text" class="form-control" value="<?php echo $data["phone"] ;?>" placeholder="Phone number"></div>
                         </div>
-                        <div class="row mt-3">
-                            <div class="col-md-4"><input name="oldPassword" type="password" class="form-control" placeholder="Password"></div>
-                        </div>
                         <div>
                             <?php  ?>
                             <a id="btn-password" class="btn btn-success mt-3" onclick="displayPassaword()" >Update password</a>

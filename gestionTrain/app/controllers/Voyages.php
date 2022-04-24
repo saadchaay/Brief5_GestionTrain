@@ -49,18 +49,14 @@
 
                     $data['Errors'] = "Something is empty, try again!";
                     
-                } elseif($data['departTime'] >= $data['arriveTime']) {
-                    $data["Errors"] = "Error timing, fix arrive time!";
-                } else{
-                    if($data['departStation'] == $data['arriveStation']) {
-                        $data['Errors'] = "Ops, the cities are match!";
+                } elseif($data['departStation'] == $data['arriveStation']) {
+                    $data['Errors'] = "Ops, the cities are match!";
+                } else {
+                    if($this->voyage->addVoyages($data)){
+                        $data['Success'] = "Your voyage has been add successfully.";
+                        header("Location: " . URLROOT . "/voyages/voyage");
                     } else {
-                        if($this->voyage->addVoyages($data)){
-                            $data['Success'] = "Your voyage has been add successfully.";
-                            header("Location: " . URLROOT . "/voyages/voyage");
-                        } else {
-                            die("something is wrong.");
-                        }
+                        die("something is wrong.");
                     }
                 }
             }
@@ -90,6 +86,59 @@
             } else {
                 header("location:". URLROOT ."/admins/login");
             }
+        }
+
+        public function editVoyage($id)
+        {
+            $voyage = $this->voyage->find_voyage($id);
+            $trains = $this->train->find_allTrain();
+            $data = [
+                'page-name' => 'Edit Voyage',
+                'voyage' => $voyage,
+                'trains' => $trains,
+                'id' => $id,
+                'departStation' => '',
+                'arriveStation' => '',
+                'departTime' => '',
+                'arriveTime' => '',
+                'Errors' => '',
+                'Success' => ''
+            ];
+
+            if($_SERVER['REQUEST_METHOD'] == 'POST'){
+                $POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+
+                $data = [
+                    "page-name" => 'Voyages',
+                    'trains' => $trains,
+                    'voyage' => $voyage,
+                    'id' => $id,
+                    'departStation' => trim($_POST['departStation']),
+                    'arriveStation' => trim($_POST['arriveStation']),
+                    'departTime' => trim($_POST['departTime']),
+                    'arriveTime' => trim($_POST['arriveTime']),
+                    'train' => trim($_POST['train']),
+                    'Errors' => '',
+                    'Success' => ''
+                ];
+
+                if(empty($data['departStation'] && $data['arriveStation'] && 
+                    $data['departTime'] && $data['arriveTime'] && $data['train'])){
+
+                    $data['Errors'] = "Something is empty, try again!";
+                    
+                } elseif($data['departStation'] == $data['arriveStation']) {
+                    $data['Errors'] = "Ops, the cities are match!";
+                } else {
+                    if($this->voyage->update_voyage($data)){
+                        $data['Success'] = "Your voyage has been add successfully.";
+                        header("Location: " . URLROOT . "/voyages/voyage");
+                    } else {
+                        die("something is wrong.");
+                    }
+                }
+            }
+            $this->view('voyages/editVoyage',$data);
         }
 
         public function cancel($id)

@@ -32,8 +32,8 @@
                         <p class="h-blue">TRAVEL FROM</p> 
                         <select name="departStation" id="" class="border-0 outline-none">
                             <option value="" hidden selected>Select city</option>
-                            <?php foreach($villes as $ville): ?>
-                                <option value="<?php echo $ville ?>"><?php echo $ville; ?></option>
+                            <?php foreach($data["cities"] as $city): ?>
+                                <option value="<?php echo $city->name ?>"><?php echo $city->name; ?></option>
                             <?php endforeach ?>
                         </select>
                     </div>
@@ -43,8 +43,8 @@
                         <p class="h-blue">TRAVEL TO</p> 
                         <select name="arriveStation" id="" class="border-0 outline-none">
                             <option value="" hidden selected>Select city</option>
-                            <?php foreach($villes as $ville): ?>
-                                <option value="<?php echo $ville ?>"><?php echo $ville; ?></option>
+                            <?php foreach($data["cities"] as $city): ?>
+                                <option value="<?php echo $city->name ?>"><?php echo $city->name; ?></option>
                             <?php endforeach ?>
                         </select>
                     </div>
@@ -67,8 +67,8 @@
                         <select name="places" class="border-0 outline-none">
                             <?php for ($i=1; $i < 11; $i++): ?>
                                 <option value="<?php echo $i ?>"><?php echo $i; ?></option>
-                                
-                            <?php endfor ?><option value="<?php echo $i+110 ?>"><?php echo $i+110; ?></option>
+                            <?php endfor ?>
+                                <option value="<?php echo $i+110 ?>"><?php echo $i+110; ?></option>
                         </select>
                     </div>
                 </div>

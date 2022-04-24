@@ -3,7 +3,7 @@
     class Voyage {
         private $db ;
 
-        public function __construct(Type $var = null)
+        public function __construct()
         {
             $this->db = new Database();
         }
@@ -54,18 +54,18 @@
 
         public function update_voyage($data)
         {
-            $this->db->query("UPDATE voyage SET 
+            $this->db->query("UPDATE `voyages` SET 
                 `garre_depart`= :depart,
                 `garre_destination`= :arrive,
                 `heure_depart`= :depart_time,
-                `heure_destination`= :arrive_time,
-            ");
+                `heure_destination`= :arrive_time
+                WHERE `id_voyage` = :id_voyage");
 
-            $this->db->bind(':depart', $data['depart_station']);
-            $this->db->bind(':arrive', $data['arrive_station']);
-            $this->db->bind(':depart_time', $data['depart_time']);
-            $this->db->bind(':arrive_time', $data['arrive_time']);
-            $this->db->bind(':status', $data['status']);
+            $this->db->bind(':depart', $data['departStation']);
+            $this->db->bind(':arrive', $data['arriveStation']);
+            $this->db->bind(':depart_time', $data['departTime']);
+            $this->db->bind(':arrive_time', $data['arriveTime']);
+            $this->db->bind(':id_voyage', $data['id']);
 
             if($this->db->execute()){
                 return true ;
@@ -95,7 +95,7 @@
             return $result ;
         }
 
-        public function countVoyage(Type $var = null)
+        public function countVoyage()
         {
             $this->db->query("SELECT * FROM voyages");
             $this->db->execute();
@@ -154,5 +154,14 @@
             }
         }
 
+        public function getCities()
+        {
+            $this->db->query("SELECT `garre_depart` as `name` from `voyages` UNION SELECT `garre_destination` as `name` FROM `voyages`");
+            if($this->db->execute()){
+                return $this->db->resultSet();
+            } else {
+                return false;
+            }
+        }
 
     }

@@ -74,10 +74,11 @@
         {
             $this->db->query("SELECT * FROM users INNER JOIN clients WHERE `users`.id_user = `clients`.id_user_fk AND `users`.id_user NOT IN (SELECT id_user FROM users WHERE id_user = :id)");
             $this->db->bind(":id", $id);
-            $results = $this->db->execute();
+            $this->db->execute();
+            $results = $this->db->resultSet(); 
             $tmp = 0;
-            if($this->db->rowCount() > 1){
-                if($results["email"] == $email || $results["username"] == $username){
+            foreach($results as $result) {
+                if($result->email == $email || $result->username == $username) {
                     $tmp = 1;
                 }
             }
@@ -91,10 +92,16 @@
 
         public function updateClient($data, $id)
         {
-            $this->db->query("UPDATE `clients` SET `username`= :username, `password`= :password WHERE `id_user_fk` = :id" );
-            $this->db->bind(":username" , $data["username"]);
-            $this->db->bind(":password" , $data["newPassword"]);
-            $this->db->bind(":id" , $id);
+            if($data["newPassword"] != "") {
+                $this->db->query("UPDATE `clients` SET `username`= :username, `password`= :password WHERE `id_user_fk` = :id" );
+                $this->db->bind(":username" , $data["username"]);
+                $this->db->bind(":password" , $data["newPassword"]);
+                $this->db->bind(":id" , $id); 
+            } else {
+                $this->db->query("UPDATE `clients` SET `username`= :username WHERE `id_user_fk` = :id" );
+                $this->db->bind(":username" , $data["username"]);
+                $this->db->bind(":id" , $id);
+            }
             if($this->db->execute()){
                 return true;
             } else {

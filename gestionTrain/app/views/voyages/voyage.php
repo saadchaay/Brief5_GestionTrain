@@ -8,14 +8,12 @@
 
         <div id="page-content-wrapper">
             
-            <?php require APPROOT. '/views/includes/navbar.php'; 
-                $villes = [
-                    "Fes","Oujda","Taourirt","El Jadida","Benguerir","Safi","Nador","Tangier","Marrakech","Casablanca"
-                ];
-            ?>
+            <?php require APPROOT. '/views/includes/navbar.php';?>
     
             <div class="container">
                 <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="">Ajouter voyage</button>
+                    
+                <!-- add travel -->
                     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
@@ -28,11 +26,7 @@
                                         <div class="row">
                                             <div class="col mb-2">
                                                 <label for="departStation" class="col-form-label">Garre de depart:</label>
-                                                <select name="departStation" class="form-select" aria-label="Default select example">
-                                                    <?php foreach ($villes as $ville): ?>
-                                                        <option value="<?php echo $ville ;?>"><?php echo $ville ;?></option>
-                                                    <?php endforeach ; ?>
-                                                </select>
+                                                <input class="form-control" type="text" name="departStation">
                                             </div>
                                             <div class="col mb-2">
                                                 <label for="departTime" class="col-form-label">Heure de depart:</label>
@@ -42,11 +36,7 @@
                                         <div class="row">
                                             <div class="col mb-2">
                                                 <label for="arriveStation" class="col-form-label">Garre de destination:</label>
-                                                <select name="arriveStation" class="form-select" aria-label="Default select example">
-                                                    <?php foreach ($villes as $ville): ?>
-                                                        <option value="<?php echo $ville ;?>"><?php echo $ville ;?></option>
-                                                    <?php endforeach ; ?>
-                                                </select>
+                                                <input class="form-control" type="text" name="arriveStation">
                                             </div>
                                             <div class="col mb-2">
                                                 <label for="arriveTime" class="col-form-label">Heure de destination:</label>
@@ -70,6 +60,10 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- edit travel -->
+                    
+
                     <div class="alert alert-danger my-2" role="alert" id="alert-failed">
                         <?php echo $data['Errors']; ?>
                     </div>
@@ -109,7 +103,13 @@
                                 }
                             ?></td>
                             <td>
-                                <button type="button" class="btn btn-success px-2 py-1" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever=""><i class="fas fa-edit" style='color: white'></i></button>
+                                <!-- <button type="button" class="btn btn-success px-2 py-1" data-bs-toggle="modal" data-bs-target="#editModel">
+                                    <i class="fas fa-edit" style='color: white'></i>
+                                </button> -->
+                                <a href="<?php echo URLROOT. "/voyages/editVoyage/". $voyage->id_voyage ?>"
+                                    class="btn btn-success px-2 py-1" >
+                                    <i class="fas fa-edit" style='color: white'></i>
+                                </a>
                                 <a href="<?php echo URLROOT. "/voyages/cancel/". $voyage->id_voyage ?>"
                                     class="btn btn-danger px-2 py-1" >
                                     <i class="fa fa-archive" style='color: white'></i>

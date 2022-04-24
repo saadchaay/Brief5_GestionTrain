@@ -26,18 +26,16 @@
                 "departing" => "",
                 "returning" => "",
                 "places" => "",
+                "cities" => "",
                 "results" => "",
                 "archives" => "",
                 "ids" => "",
                 "trains" => "",
                 "Errors" => ""
             ];
-            
-            print_r($data["Errors"]);
-            
+            date_default_timezone_set('UTC');
             if($_SERVER["REQUEST_METHOD"] === "POST"){
                 $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
-
                 $data = [
                     "title_page" => "Booking",
                     "return_way" => trim($_POST["book"]),
@@ -46,6 +44,7 @@
                     "departing" => trim($_POST["departTime"]),
                     "returning" => trim($_POST["arriveTime"]),
                     "places" => trim($_POST["places"]),
+                    "cities" => $this->voyage->getCities(),
                     "results" => "",
                     "archives" => "",
                     "ids" => "",
@@ -56,14 +55,14 @@
                 if(empty($data["departStation"]) || empty($data["arriveStation"]) || empty($data["departing"])){
                     $data["Errors"] = "Some field is empty, try again";
                 }elseif($data["return_way"] === "Roundtrip"){
-                        if(empty($data["returning"])){
-                            $data["Errors"] = "Returning date is empty, try again!";
-                        }elseif($data["returning"] < $data["departing"]){
-                            $data["Errors"] = "Returning date can't be before departing date!";
-                        }
+                    if(empty($data["returning"])){
+                        $data["Errors"] = "Returning date is empty, try again!";
+                    }elseif($data["returning"] < $data["departing"]){
+                        $data["Errors"] = "Returning date can't be before departing date!";
+                    }
                 }elseif($data["departing"] < date("Y-m-d")){
-                        $data["Errors"] = "Departing date can't be before today!";
-                } 
+                    $data["Errors"] = "Departing date can't be before today!";
+                }
                 $data["archives"] = $this->voyage->find_join_voyage();
 
                 $i = 0 ;
@@ -74,20 +73,34 @@
                         $i++;
                     }
                 }
-
                 if(empty($data["Errors"])){
                     if($this->voyage->find_voyage_by_station($data["departStation"],$data["arriveStation"])){
                         $results = $this->voyage->find_voyage_by_station($data["departStation"],$data["arriveStation"]);
                         if(!empty($ids_voyage)){
-                            for ($j=0; $j < count((array)$results); $j++) { 
-                                for ($i=0; $i < count((array)$ids_voyage); $i++) { 
+                            for ($i=0; $i < count((array)$ids_voyage); $i++){ 
+                                for ($j=0; $j < count((array)$results); $j++) { 
                                     if($results[$j]->id_voyage === $ids_voyage[$i]){
-                                        unset($results[$j]);
+                                        if($results[$j]){
+                                            unset($results[$j]);    
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            for ($j=0; $j < count((array)$results); $j++) { 
+                                if(date("H:i", strtotime($results[$j]->heure_depart)) < date("H:i") && date("Y-m-d", strtotime($results[$j]->heure_depart)) == $data["departing"]){
+                                    if($results[$j]){
+                                        unset($results[$j]);    
                                     }
                                 }
                             }
                         }
-                        $data["results"] = $results;
+                        
+                        if(!$results){
+                            $data["Errors"] = "No Trip found";
+                        } else {
+                            $data["results"] = $results;
+                        }
                         $this->view('pages/booking', $data);
                     } else {
                         $data["Errors"] = "No trips available";
@@ -98,6 +111,7 @@
                 }
             }
             else {
+                $data["cities"] = $this->voyage->getCities();
                 $this->view('pages/booking', $data);
             }
         }
@@ -118,9 +132,8 @@
                 "Ticket" => []
             ];
             
-            $place_this_voyage = $this->voyage->join_VBT($data["id_voyage"]);
-
-            if($place_this_voyage[0]->places - count($place_this_voyage) < $data["places"]) {
+            $all__ = $this->voyage->join_VBT($data["id_voyage"]);
+            if($all__[0]->places - count($all__) < $data["places"]) {
                 $data["Errors"] = "All places have been reserved, there's no places more on the train.";
                 $this->view("pages/booking", $data);
             } else {
@@ -260,7 +273,8 @@
                 "booking" => $this->booking->get_reservation($id_booking),
                 "status" => "",
                 "Errors" => "",
-            ];
+            ];    
+            date_default_timezone_set('UTC'); 
 
             $date_now = date("Y-m-d");
 
@@ -269,7 +283,7 @@
             $arr_time_now = ($arr_time_now[0]*60) + $arr_time_now[1];
             $arr_voyage_time = explode(":", $status["booking"]->heure_depart);
             $arr_voyage_time = ($arr_voyage_time[0]*60) + $arr_voyage_time[1];
-
+            
             if($date_now > $status["booking"]->date_voyage){
                 $status["Errors"] = "The date is expired" ;
                 $status["status"] = "Expired" ;
@@ -323,26 +337,32 @@
                     "Success" => "",
                     "Errors" => "" 
                 ];
+                // $this->view("/pages/ticket", $data);
             }
 
             if($_SERVER["REQUEST_METHOD"] == "POST"){
                 $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
-                $data["Success"] = "";
-                $data["ticketNum"] = trim($_POST["ticketNum"]);
-
+                $data = [
+                    "voyage" => "",
+                    "ticket_details" => "",
+                    "ticketNum" => trim($_POST["ticketNum"]),
+                    "Success" => "",
+                    "Errors" => "" 
+                ];
+                
                 if(empty($data["ticketNum"])){
                     $data["Errors"] = "Please Enter Your Ticket Number!";
                 } elseif(strlen($data["ticketNum"]) < 7 ){
                     $data["Errors"] = "Please the ticket number must be at least 8 number!";
                 }
 
-                if(!empty($data["Errors"])){
+                if(empty($data["Errors"])){
                     if($this->ticket->get_ticket($data["ticketNum"])){
                         $data["ticket_details"] = $this->ticket->get_ticket($data["ticketNum"]);
+                        $this->view("/pages/ticket", $data);
                     }
                 }
             }
-            
             $_SESSION["Ticket"] = [];
             unset($_SESSION["Ticket"]);
             $this->view("/pages/ticket", $data);

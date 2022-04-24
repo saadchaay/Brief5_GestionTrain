@@ -1,6 +1,7 @@
 @import 'mixins' ;
 
-@include form-register;
+// @include form-register;
+
 
 @include navbar-home ;
 
@@ -9,3 +10,5 @@
 @include booking-form ;
 
 @include search-input;
+
+// @include login-section;

@@ -6,11 +6,18 @@ password: admin00123
 
 // clients
 
-username: saad09 
-password: qwer1234
+username: saad99
+password: saad1234
 
 //TODO: 
 page my reservations : done
 canceling before 1 hour: done
 order trips by time: done
 tickets: done
+
+register form: done
+edit admin, voyage: not yet
+check hour : done -> check voyage hour don't display travels which their time is expired 
+profil error: done
+voyage error: done
+uml
